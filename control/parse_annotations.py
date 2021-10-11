@@ -105,9 +105,10 @@ def generate_labels():
                 # visualize(current_image, [annot["bbox"]], [annot["category_id"]], category_id_to_name)
 
                 yolo_bbox = coco_to_yolo(annot["bbox"], current_image.shape[1], current_image.shape[0])
+                # e.g. 45 0.479492 0.688771 0.955609 0.5955 \n
                 temp = str(coco_to_yolo_map[annot["category_id"]]) + " " + " ".join(map(lambda x: str(x), yolo_bbox)) + "\n"
                 print(temp)
-                save_text(temp, label_paths[key] + label_file_name, "a+")
+                save_text(temp, label_paths[key] + label_file_name, "a+")  # Save and Append the line
 
 
 if __name__ == '__main__':
