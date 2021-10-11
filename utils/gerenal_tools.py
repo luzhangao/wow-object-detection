@@ -74,16 +74,18 @@ def open_text(fpath):
         return f.read()
 
 
-def save_text(data, fpath):
+def save_text(data, fpath, save_type="w"):
     """
     Save text file.
     :param data:
            The data need to be saved.
     :param fpath:
            The file path.
+    :param save_type:
+           How to save the txt.
     :return:
     """
-    with open(fpath, "w", encoding='utf-8') as f:
+    with open(fpath, save_type, encoding='utf-8') as f:
         f.write(data)
 
 
