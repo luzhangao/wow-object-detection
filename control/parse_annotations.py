@@ -21,11 +21,13 @@ def parse_annotation_file():
     check some measures
     :return:
     """
-    fpath = "../raw_data/coco2017/2017_TrainVal_annotations/annotations/instances_train2017.json"
+    fpath = "../raw_data/coco2017/2017_TrainVal_annotations/annotations/instances_val2017.json"
     # fpath = "../raw_data/coco2017/2017_TrainVal_annotations/annotations/captions_val2017.json"
     # fpath = "../raw_data/coco2017/2017_TrainVal_annotations/annotations/person_keypoints_val2017.json"
 
     instances_val2017 = COCO(fpath)
+    for label in instances_val2017.dataset["categories"]:
+        print(label["id"], label["name"])
     print(len(instances_val2017.dataset["categories"]))  # 80
     print(len(instances_val2017.dataset["images"]))  # 5000
     print(len(instances_val2017.dataset["annotations"]))  # 36781
@@ -38,7 +40,7 @@ def parse_annotation_file():
         image_id_group.append(elem["image_id"])
 
     print(sorted(category_id_group))
-    print(sorted(image_id_group))
+    # print(sorted(image_id_group))
 
 
 def coco_to_yolo(bbox, width, height):
@@ -87,6 +89,12 @@ def generate_labels():
         category_id_to_name = {}
         for elem in instances_dataset.dataset["categories"]:
             category_id_to_name[elem["id"]] = elem["name"]
+        # Remove null labels and reindex the labels as 0 - {nc -1}
+        yolo_categories = {}
+        coco_to_yolo_map = {}
+        for elem in zip(range(0, len(category_id_to_name)), sorted(category_id_to_name.items(), key=lambda kv: (kv[1], kv[0]))):
+            coco_to_yolo_map[elem[1][0]] = elem[0]  # {coco index: yolo index} e.g. {1: 0} for "person"
+            yolo_categories[elem[0]] = elem[1][1]  # {yolo index: name} e.g.  {0: "person"}
 
         for annot in instances_dataset.dataset["annotations"]:
             image_file_name = "000000" + str(annot["image_id"]) + ".jpg"
@@ -97,14 +105,9 @@ def generate_labels():
                 # visualize(current_image, [annot["bbox"]], [annot["category_id"]], category_id_to_name)
 
                 yolo_bbox = coco_to_yolo(annot["bbox"], current_image.shape[1], current_image.shape[0])
-                temp = str(annot["category_id"]) + " " + " ".join(map(lambda x: str(x), yolo_bbox)) + "\n"
+                temp = str(coco_to_yolo_map[annot["category_id"]]) + " " + " ".join(map(lambda x: str(x), yolo_bbox)) + "\n"
                 print(temp)
                 save_text(temp, label_paths[key] + label_file_name, "a+")
-
-
-
-
-
 
 
 if __name__ == '__main__':
