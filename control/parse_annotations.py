@@ -67,22 +67,25 @@ def generate_labels():
     generate labels txt files based on coco2017 dataset
     :return:
     """
-    annotation_path = "../raw_data/coco2017/2017_TrainVal_annotations/annotations/"
+    annotation_paths = {
+        "val2017": "../raw_data/coco2017/2017_TrainVal_annotations/annotations/",
+        "train2017": "../raw_data/coco2017/2017_TrainVal_annotations/annotations/",
+    }
     json_paths = {
         "val2017": "instances_val2017.json",
-        "train2017": "instances_train2017.json"
+        "train2017": "instances_train2017.json",
     }
     image_paths = {
         "val2017": "../raw_data/coco2017/images/val2017/",
-        "train2017": "../raw_data/coco2017/images/train2017/"
+        "train2017": "../raw_data/coco2017/images/train2017/",
     }
     label_paths = {
         "val2017": "../raw_data/coco2017/labels/val2017/",
-        "train2017": "../raw_data/coco2017/labels/train2017/"
+        "train2017": "../raw_data/coco2017/labels/train2017/",
     }
 
     for key in json_paths:
-        fpath = annotation_path + json_paths[key]
+        fpath = annotation_paths[key] + json_paths[key]
         instances_dataset = COCO(fpath)
         # Generate a dictionary for categories
         # [{'supercategory': 'person', 'id': 1, 'name': 'person'}, ...] ==> {1: "person", ...}

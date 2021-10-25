@@ -8,8 +8,8 @@
 path: ../raw_data/coco2017  # dataset root dir
 # train: images/train2017  # train images (relative to 'path') ? images
 # val: images/val2017  # val images (relative to 'path') ? images
-train: images/sample_train2017  # train images (relative to 'path') 500 images
-val: images/sample_val2017  # val images (relative to 'path') 100 images
+train: images/sample_train2017  # train images (relative to 'path') 8000 images
+val: images/sample_val2017  # val images (relative to 'path') 2000 images
 test:  image/test2017 # test images (optional)
 
 # Classes
