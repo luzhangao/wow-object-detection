@@ -11,6 +11,7 @@ Some tools to save and open files.
 import pickle
 import json
 import hickle
+import yaml
 
 
 def open_pickle(fpath):
@@ -115,6 +116,18 @@ def save_hickle(data, fpath, iscompress=True):
         hickle.dump(data, fpath, mode='w', compression='gzip')
     else:
         hickle.dump(data, fpath, mode='w')
+
+
+def open_yaml(fpath):
+    """
+    Open yaml file.
+    :param fpath: string
+           The file path.
+    :return:
+    """
+    with open(fpath, "rb") as f:
+        info = yaml.safe_load(f)
+    return info
 
 
 if __name__ == '__main__':
