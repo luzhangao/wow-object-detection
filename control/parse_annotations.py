@@ -190,6 +190,7 @@ def generate_labels():
                 69   69        185        7            oven
                 5   35        164       11  baseball glove
                 """
+                map_dict = {49: 0, 18: 1, 22: 2, 12: 3, 13: 4}
                 if coco_to_yolo_map[annot["category_id"]] in [49, 18, 22, 12, 13]:
                     current_image = cv2.imread(image_paths[key] + image_file_name)  # shape (height, width, channels)
                     # Display the picture with bounding box
@@ -197,12 +198,15 @@ def generate_labels():
                     yolo_bbox = coco_to_yolo(annot["bbox"], current_image.shape[1], current_image.shape[0])
 
                     # e.g. 45 0.479492 0.688771 0.955609 0.5955 \n
-                    temp = str(coco_to_yolo_map[annot["category_id"]]) + " " + " ".join(map(lambda x: str(x), yolo_bbox)) + "\n"
+                    # temp = str(coco_to_yolo_map[annot["category_id"]]) + " " + " ".join(map(lambda x: str(x), yolo_bbox)) + "\n"
+                    # The category index should be changed from [49, 18, 22, 12, 13] to range(0, 5) because Yolo will
+                    # validate the indices.
+                    temp = str(map_dict[coco_to_yolo_map[annot["category_id"]]]) + " " + " ".join(map(lambda x: str(x), yolo_bbox)) + "\n"
                     print(temp)
                     save_text(temp, label_paths[key] + label_file_name, "a+")  # Save and Append the line
 
 
 if __name__ == '__main__':
-    parse_annotation_file()
-    # generate_labels()
+    # parse_annotation_file()
+    generate_labels()
 

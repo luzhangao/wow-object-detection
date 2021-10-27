@@ -134,6 +134,6 @@ def analyze_distributions():
 
 
 if __name__ == '__main__':
-    clear_train_and_val_set()
-    # sample_and_save(val2017=800, train2017=4000)
-    # analyze_distributions()
+    # clear_train_and_val_set()
+    sample_and_save(val2017=800, train2017=4000)
+    analyze_distributions()
