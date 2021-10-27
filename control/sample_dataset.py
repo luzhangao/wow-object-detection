@@ -12,7 +12,7 @@ import os
 import random
 import shutil
 import pandas as pd
-from utils.gerenal_tools import open_text
+from utils.gerenal_tools import open_text, open_yaml
 
 
 image_paths = {
@@ -64,6 +64,13 @@ def sample_and_save(**kwargs):
                 shutil.copy(label_source_path, label_destination_path)
 
 
+def clear_train_and_val_set():
+    """
+    clear all images and label from sample_train2017 and val_train2017
+    :return:
+    """
+
+
 def dataset_distributions(label_key, path_dict):
     """
     Compute the distributions of the classifications for the specific dataset.
@@ -101,6 +108,13 @@ def analyze_distributions():
     # df = pd.DataFrame(temp)
     # df.to_csv("coco2017_distribution.csv")
 
+    # df = pd.read_csv("coco2017_distribution.csv", index_col=0)
+    # coco_categories = open_yaml("../yolov5/data/coco128.yaml")["names"]
+    # df["category_name"] = df["clf"].apply(lambda x: coco_categories[x])
+    # # Display all rows
+    # pd.set_option("display.max_rows", 100)
+    # print(df.sort_values("train2017", ascending=False))
+
     train2017 = dataset_distributions("train2017", label_sample_paths)
     val2017 = dataset_distributions("val2017", label_sample_paths)
     df = pd.read_csv("coco2017_distribution.csv")
@@ -114,5 +128,5 @@ def analyze_distributions():
 
 
 if __name__ == '__main__':
-    # sample_and_save(val2017=2000, train2017=8000)
+    sample_and_save(val2017=800, train2017=4000)
     analyze_distributions()

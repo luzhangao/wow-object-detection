@@ -103,18 +103,106 @@ def generate_labels():
             image_file_name = "000000" + str(annot["image_id"]) + ".jpg"
             label_file_name = "000000" + str(annot["image_id"]) + ".txt"
             if os.path.isfile(image_paths[key] + image_file_name):
-                current_image = cv2.imread(image_paths[key] + image_file_name)  # shape (height, width, channels)
-                # Display the picture with bounding box
-                # visualize(current_image, [annot["bbox"]], [annot["category_id"]], category_id_to_name)
+                """
+                80 categories is too much for the training dataset with 4000 or less images. According the result from
+                control.sample_dataset.analyze_distributions (table below), I plan to choose the top 5 categories. 
+                The top 5 categories are ["orange", "sheep", "zebra", "parking meter", "bench"] and their indices are 
+                [49, 18, 22, 12, 13]
+                    clf  train2017  val2017   category_name
+                49   49     217224     9000          orange
+                18   18      36114     1636           sheep
+                22   22      31955     1422           zebra
+                12   12      20688      981   parking meter
+                13   13      20231      855           bench
+                26   26      17197      729         handbag
+                27   27      13026      557             tie
+                14   14      11812      508            bird
+                72   72      10612      582    refrigerator
+                36   36      10183      463      skateboard
+                76   76       9436      379        scissors
+                10   10       9011      346    fire hydrant
+                11   11       8968      353       stop sign
+                74   74       8243      361           clock
+                8     8       8227      335            boat
+                56   56       7891      337           chair
+                3     3       7739      295      motorcycle
+                40   40       7532      289      wine glass
+                44   44       7264      313           spoon
+                2     2       7167      286             car
+                51   51       7163      286          carrot
+                25   25       6781      340        umbrella
+                78   78       6565      285      hair drier
+                19   19       6484      334             cow
+                41   41       6421      268             cup
+                15   15       5987      236             cat
+                9     9       5978      241   traffic light
+                29   29       5958      289         frisbee
+                59   59       5555      200             bed
+                77   77       5486      225      teddy bear
+                21   21       5411      210            bear
+                37   37       5400      232       surfboard
+                68   68       5349      180       microwave
+                46   46       5333      252          banana
+                62   62       5215      221              tv
+                23   23       5207      227         giraffe
+                17   17       5184      290           horse
+                61   61       5130      209          toilet
+                65   65       5124      217          remote
+                16   16       5088      237             dog
+                64   64       5026      265           mouse
+                1     1       4877      206         bicycle
+                75   75       4861      240            vase
+                24   24       4828      218        backpack
+                50   50       4765      248        broccoli
+                57   57       4690      191           couch
+                53   53       4673      235           pizza
+                30   30       4615      221            skis
+                58   58       4602      151    potted plant
+                28   28       4532      182        suitcase
+                32   32       4494      180     sports ball
+                0     0       4339      123          person
+                79   79       4335      212      toothbrush
+                34   34       4152      203    baseball bat
+                42   42       4135      183            fork
+                66   66       3997      156        keyboard
+                67   67       3984      176      cell phone
+                20   20       3977      168        elephant
+                73   73       3753      160            book
+                54   54       3657      146           donut
+                7     7       3462      128           truck
+                70   70       3403      152         toaster
+                5     5       3117      124             bus
+                47   47       2768      119           apple
+                4     4       2706      114        airplane
+                38   38       2413       94   tennis racket
+                39   39       2392      122          bottle
+                60   60       2302       52    dining table
+                52   52       2204      104         hot dog
+                33   33       2200       98            kite
+                45   45       1868       86            bowl
+                63   63       1658       65          laptop
+                71   71       1598       55            sink
+                31   31       1530       82       snowboard
+                43   43       1414       48           knife
+                55   55       1226       33            cake
+                6     6       1084       60           train
+                48   48       1053       44        sandwich
+                69   69        185        7            oven
+                5   35        164       11  baseball glove
+                """
+                if coco_to_yolo_map[annot["category_id"]] in [49, 18, 22, 12, 13]:
+                    current_image = cv2.imread(image_paths[key] + image_file_name)  # shape (height, width, channels)
+                    # Display the picture with bounding box
+                    # visualize(current_image, [annot["bbox"]], [annot["category_id"]], category_id_to_name)
+                    yolo_bbox = coco_to_yolo(annot["bbox"], current_image.shape[1], current_image.shape[0])
 
-                yolo_bbox = coco_to_yolo(annot["bbox"], current_image.shape[1], current_image.shape[0])
-                # e.g. 45 0.479492 0.688771 0.955609 0.5955 \n
-                temp = str(coco_to_yolo_map[annot["category_id"]]) + " " + " ".join(map(lambda x: str(x), yolo_bbox)) + "\n"
-                print(temp)
-                save_text(temp, label_paths[key] + label_file_name, "a+")  # Save and Append the line
+                    # e.g. 45 0.479492 0.688771 0.955609 0.5955 \n
+                    temp = str(coco_to_yolo_map[annot["category_id"]]) + " " + " ".join(map(lambda x: str(x), yolo_bbox)) + "\n"
+                    print(temp)
+                    save_text(temp, label_paths[key] + label_file_name, "a+")  # Save and Append the line
 
 
 if __name__ == '__main__':
-    # parse_annotation_file()
-    generate_labels()
+    parse_annotation_file()
+    # generate_labels()
 
