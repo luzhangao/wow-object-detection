@@ -69,6 +69,12 @@ def clear_train_and_val_set():
     clear all images and label from sample_train2017 and val_train2017
     :return:
     """
+    for key in label_sample_paths:
+        shutil.rmtree(label_sample_paths[key])
+        os.mkdir(label_sample_paths[key])
+    for key in image_sample_paths:
+        shutil.rmtree(image_sample_paths[key])
+        os.mkdir(image_sample_paths[key])
 
 
 def dataset_distributions(label_key, path_dict):
@@ -128,5 +134,6 @@ def analyze_distributions():
 
 
 if __name__ == '__main__':
-    sample_and_save(val2017=800, train2017=4000)
-    analyze_distributions()
+    clear_train_and_val_set()
+    # sample_and_save(val2017=800, train2017=4000)
+    # analyze_distributions()
