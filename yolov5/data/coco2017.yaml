@@ -15,7 +15,7 @@ test:  image/test2017 # test images (optional)
 # Classes
 nc: 5  # number of classes
 # [49, 18, 22, 12, 13]
-names: ['orange', 'sheep', 'zebra', 'parking meter', 'bench'] # class names
+names: ["person", "car", "chair", "book", "bottle"] # class names
 
 
 # Download script/URL (optional)

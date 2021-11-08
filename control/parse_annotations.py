@@ -7,6 +7,25 @@
 @description: parse the annotation json file
 https://cocodataset.org/#format-data
 https://zhuanlan.zhihu.com/p/29393415
+parent
+├── datasets
+    └── coco128
+        └── images
+            └── train
+            └── val
+        └── labels
+            └── train
+            └── val
+└── raw_data
+    └── coco2017
+        └── 2017_TrainVal_annotations
+            └── annotations
+        └── images
+            └── train
+            └── val
+        └── labels
+            └── train
+            └── val
 """
 
 import os
@@ -62,6 +81,25 @@ def coco_to_yolo(bbox, width, height):
     return list(map(lambda x: round(x, 6), yolo_bbox))
 
 
+def yolo_to_coco(bbox, width, height):
+    """
+    yolo bbox -> coco bbox
+    normalized [x_center, y_center, width, height] -> [x_min, y_min, width, height]
+    [0.4046875, 0.8613583, 0.503125, 0.24375] -> [98, 345, 322, 117]
+    :param bbox: list, normalized [x_center, y_center, width, height]
+    :param width: int  the width px of the picture
+    :param height: int  the height px of the picture
+    :return: [x_min, y_min, width, height]
+    """
+    x_center, y_center, yolo_w, yolo_h = bbox
+    coco_w = yolo_w * width
+    coco_h = yolo_h * height
+    x_min = x_center * width - coco_w / 2
+    y_min = y_center * height - coco_h / 2
+    coco_bbox = [x_min, y_min, coco_w, coco_h]
+    return list(map(lambda x: round(x), coco_bbox))
+
+
 def generate_labels():
     """
     generate labels txt files based on coco2017 dataset
@@ -98,7 +136,14 @@ def generate_labels():
         for elem in zip(range(0, len(category_id_to_name)), sorted(category_id_to_name.items(), key=lambda kv: (kv[1], kv[0]))):
             coco_to_yolo_map[elem[1][0]] = elem[0]  # {coco index: yolo index} e.g. {1: 0} for "person"
             yolo_categories[elem[0]] = elem[1][1]  # {yolo index: name} e.g.  {0: "person"}
-
+        """
+        coco_to_yolo_map {5: 0, 53: 1, 27: 2, 52: 3, 39: 4, 40: 5, 23: 6, 65: 7, 15: 8, 2: 9, 16: 10, 9: 11, 84: 12, 44: 13, 51: 14, 56: 15, 6: 16, 61: 17, 3: 18, 57: 19, 17: 20, 77: 21, 62: 22, 85: 23, 63: 24, 21: 25, 47: 26, 67: 27, 18: 28, 60: 29, 22: 30, 11: 31, 48: 32, 34: 33, 25: 34, 89: 35, 31: 36, 19: 37, 58: 38, 76: 39, 38: 40, 49: 41, 73: 42, 78: 43, 4: 44, 74: 45, 55: 46, 79: 47, 14: 48, 1: 49, 59: 50, 64: 51, 82: 52, 75: 53, 54: 54, 87: 55, 20: 56, 81: 57, 41: 58, 35: 59, 36: 60, 50: 61, 37: 62, 13: 63, 33: 64, 42: 65, 88: 66, 43: 67, 32: 68, 80: 69, 70: 70, 90: 71, 10: 72, 7: 73, 8: 74, 72: 75, 28: 76, 86: 77, 46: 78, 24: 79}
+        yolo_categories {0: 'airplane', 1: 'apple', 2: 'backpack', 3: 'banana', 4: 'baseball bat', 5: 'baseball glove', 6: 'bear', 7: 'bed', 8: 'bench', 9: 'bicycle', 10: 'bird', 11: 'boat', 12: 'book', 13: 'bottle', 14: 'bowl', 15: 'broccoli', 16: 'bus', 17: 'cake', 18: 'car', 19: 'carrot', 20: 'cat', 21: 'cell phone', 22: 'chair', 23: 'clock', 24: 'couch', 25: 'cow', 26: 'cup', 27: 'dining table', 28: 'dog', 29: 'donut', 30: 'elephant', 31: 'fire hydrant', 32: 'fork', 33: 'frisbee', 34: 'giraffe', 35: 'hair drier', 36: 'handbag', 37: 'horse', 38: 'hot dog', 39: 'keyboard', 40: 'kite', 41: 'knife', 42: 'laptop', 43: 'microwave', 44: 'motorcycle', 45: 'mouse', 46: 'orange', 47: 'oven', 48: 'parking meter', 49: 'person', 50: 'pizza', 51: 'potted plant', 52: 'refrigerator', 53: 'remote', 54: 'sandwich', 55: 'scissors', 56: 'sheep', 57: 'sink', 58: 'skateboard', 59: 'skis', 60: 'snowboard', 61: 'spoon', 62: 'sports ball', 63: 'stop sign', 64: 'suitcase', 65: 'surfboard', 66: 'teddy bear', 67: 'tennis racket', 68: 'tie', 69: 'toaster', 70: 'toilet', 71: 'toothbrush', 72: 'traffic light', 73: 'train', 74: 'truck', 75: 'tv', 76: 'umbrella', 77: 'vase', 78: 'wine glass', 79: 'zebra'}
+        category_id_to_name {1: 'person', 2: 'bicycle', 3: 'car', 4: 'motorcycle', 5: 'airplane', 6: 'bus', 7: 'train', 8: 'truck', 9: 'boat', 10: 'traffic light', 11: 'fire hydrant', 13: 'stop sign', 14: 'parking meter', 15: 'bench', 16: 'bird', 17: 'cat', 18: 'dog', 19: 'horse', 20: 'sheep', 21: 'cow', 22: 'elephant', 23: 'bear', 24: 'zebra', 25: 'giraffe', 27: 'backpack', 28: 'umbrella', 31: 'handbag', 32: 'tie', 33: 'suitcase', 34: 'frisbee', 35: 'skis', 36: 'snowboard', 37: 'sports ball', 38: 'kite', 39: 'baseball bat', 40: 'baseball glove', 41: 'skateboard', 42: 'surfboard', 43: 'tennis racket', 44: 'bottle', 46: 'wine glass', 47: 'cup', 48: 'fork', 49: 'knife', 50: 'spoon', 51: 'bowl', 52: 'banana', 53: 'apple', 54: 'sandwich', 55: 'orange', 56: 'broccoli', 57: 'carrot', 58: 'hot dog', 59: 'pizza', 60: 'donut', 61: 'cake', 62: 'chair', 63: 'couch', 64: 'potted plant', 65: 'bed', 67: 'dining table', 70: 'toilet', 72: 'tv', 73: 'laptop', 74: 'mouse', 75: 'remote', 76: 'keyboard', 77: 'cell phone', 78: 'microwave', 79: 'oven', 80: 'toaster', 81: 'sink', 82: 'refrigerator', 84: 'book', 85: 'clock', 86: 'vase', 87: 'scissors', 88: 'teddy bear', 89: 'hair drier', 90: 'toothbrush'}
+        """
+        # print("coco_to_yolo_map", coco_to_yolo_map)
+        # print("yolo_categories", yolo_categories)
+        # print("category_id_to_name", category_id_to_name)
         for annot in instances_dataset.dataset["annotations"]:
             image_file_name = "000000" + str(annot["image_id"]) + ".jpg"
             label_file_name = "000000" + str(annot["image_id"]) + ".txt"
@@ -106,89 +151,14 @@ def generate_labels():
                 """
                 80 categories is too much for the training dataset with 4000 or less images. According the result from
                 control.sample_dataset.analyze_distributions (table below), I plan to choose the top 5 categories. 
-                The top 5 categories are ["orange", "sheep", "zebra", "parking meter", "bench"] and their indices are 
+                The top 5 categories are ["person", "car", "chair", "book", "bottle"] and their indices are 
                 [49, 18, 22, 12, 13]
                     clf  train2017  val2017   category_name
-                49   49     217224     9000          orange
-                18   18      36114     1636           sheep
-                22   22      31955     1422           zebra
-                12   12      20688      981   parking meter
-                13   13      20231      855           bench
-                26   26      17197      729         handbag
-                27   27      13026      557             tie
-                14   14      11812      508            bird
-                72   72      10612      582    refrigerator
-                36   36      10183      463      skateboard
-                76   76       9436      379        scissors
-                10   10       9011      346    fire hydrant
-                11   11       8968      353       stop sign
-                74   74       8243      361           clock
-                8     8       8227      335            boat
-                56   56       7891      337           chair
-                3     3       7739      295      motorcycle
-                40   40       7532      289      wine glass
-                44   44       7264      313           spoon
-                2     2       7167      286             car
-                51   51       7163      286          carrot
-                25   25       6781      340        umbrella
-                78   78       6565      285      hair drier
-                19   19       6484      334             cow
-                41   41       6421      268             cup
-                15   15       5987      236             cat
-                9     9       5978      241   traffic light
-                29   29       5958      289         frisbee
-                59   59       5555      200             bed
-                77   77       5486      225      teddy bear
-                21   21       5411      210            bear
-                37   37       5400      232       surfboard
-                68   68       5349      180       microwave
-                46   46       5333      252          banana
-                62   62       5215      221              tv
-                23   23       5207      227         giraffe
-                17   17       5184      290           horse
-                61   61       5130      209          toilet
-                65   65       5124      217          remote
-                16   16       5088      237             dog
-                64   64       5026      265           mouse
-                1     1       4877      206         bicycle
-                75   75       4861      240            vase
-                24   24       4828      218        backpack
-                50   50       4765      248        broccoli
-                57   57       4690      191           couch
-                53   53       4673      235           pizza
-                30   30       4615      221            skis
-                58   58       4602      151    potted plant
-                28   28       4532      182        suitcase
-                32   32       4494      180     sports ball
-                0     0       4339      123          person
-                79   79       4335      212      toothbrush
-                34   34       4152      203    baseball bat
-                42   42       4135      183            fork
-                66   66       3997      156        keyboard
-                67   67       3984      176      cell phone
-                20   20       3977      168        elephant
-                73   73       3753      160            book
-                54   54       3657      146           donut
-                7     7       3462      128           truck
-                70   70       3403      152         toaster
-                5     5       3117      124             bus
-                47   47       2768      119           apple
-                4     4       2706      114        airplane
-                38   38       2413       94   tennis racket
-                39   39       2392      122          bottle
-                60   60       2302       52    dining table
-                52   52       2204      104         hot dog
-                33   33       2200       98            kite
-                45   45       1868       86            bowl
-                63   63       1658       65          laptop
-                71   71       1598       55            sink
-                31   31       1530       82       snowboard
-                43   43       1414       48           knife
-                55   55       1226       33            cake
-                6     6       1084       60           train
-                48   48       1053       44        sandwich
-                69   69        185        7            oven
-                5   35        164       11  baseball glove
+                49   49     217224     9000          person
+                18   18      36114     1636             car
+                22   22      31955     1422           chair
+                12   12      20688      981            book
+                13   13      20231      855          bottle
                 """
                 map_dict = {49: 0, 18: 1, 22: 2, 12: 3, 13: 4}
                 if coco_to_yolo_map[annot["category_id"]] in [49, 18, 22, 12, 13]:
